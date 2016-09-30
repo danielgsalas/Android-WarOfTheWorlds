@@ -1,11 +1,10 @@
-package com.appstoremarketresearch.android_waroftheworlds;
+package com.appstoremarketresearch.android_waroftheworlds.controller;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
@@ -16,7 +15,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.controller.ItemDetailActivity;
 import com.appstoremarketresearch.android_waroftheworlds.dummy.DummyContent;
+import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragment;
 
 import java.util.List;
 

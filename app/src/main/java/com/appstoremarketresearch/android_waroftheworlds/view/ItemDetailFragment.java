@@ -1,4 +1,4 @@
-package com.appstoremarketresearch.android_waroftheworlds;
+package com.appstoremarketresearch.android_waroftheworlds.view;
 
 import android.app.Activity;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.appstoremarketresearch.android_waroftheworlds.controller.ItemListActivity;
+import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.controller.ItemDetailActivity;
 import com.appstoremarketresearch.android_waroftheworlds.dummy.DummyContent;
 
 /**
