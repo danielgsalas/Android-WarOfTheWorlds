@@ -1,9 +1,11 @@
 package com.appstoremarketresearch.android_waroftheworlds.controller;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
@@ -11,8 +13,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragment;
 import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentOne;
+import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentTwo;
 
 /**
  * An activity representing a single Item detail screen. This
@@ -20,7 +23,10 @@ import com.appstoremarketresearch.android_waroftheworlds.R;
  * item details are presented side-by-side with a list of items
  * in a {@link ItemListActivity}.
  */
-public class ItemDetailActivity extends AppCompatActivity {
+public class ItemDetailActivity extends AppCompatActivity
+    implements
+        ItemDetailFragmentOne.OnFragmentInteractionListener,
+        ItemDetailFragmentTwo.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +59,21 @@ public class ItemDetailActivity extends AppCompatActivity {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
+
         if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(ItemDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
-            ItemDetailFragment fragment = new ItemDetailFragment();
-            fragment.setArguments(arguments);
+            int fragmentIndex = getIntent().getIntExtra(ItemListActivity.FRAGMENT_INDEX, 0);
+            Fragment fragment = ItemListActivity.createFragmentForPosition(fragmentIndex);
+
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.item_detail_container, fragment)
                     .commit();
         }
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        // NO OP
     }
 
     @Override

@@ -10,6 +10,8 @@ import java.util.Map;
  * Android template wizards.
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
+ *
+ * @deprecated
  */
 public class DummyContent {
 

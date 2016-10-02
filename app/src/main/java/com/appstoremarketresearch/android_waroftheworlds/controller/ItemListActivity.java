@@ -2,8 +2,10 @@ package com.appstoremarketresearch.android_waroftheworlds.controller;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,11 +18,8 @@ import android.widget.TextView;
 
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
-import com.appstoremarketresearch.android_waroftheworlds.controller.ItemDetailActivity;
-import com.appstoremarketresearch.android_waroftheworlds.dummy.DummyContent;
-import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragment;
-
-import java.util.List;
+import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentOne;
+import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentTwo;
 
 /**
  * An activity representing a list of Items. This activity
@@ -30,13 +29,41 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ItemListActivity extends AppCompatActivity {
+public class ItemListActivity
+    extends AppCompatActivity
+    implements
+        ItemDetailFragmentOne.OnFragmentInteractionListener,
+        ItemDetailFragmentTwo.OnFragmentInteractionListener
+{
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
+
+    public static final String FRAGMENT_INDEX = "fragment_index";
+
+    /**
+     * createFragmentForPosition
+     */
+    protected static Fragment createFragmentForPosition(int position) {
+
+        Fragment fragment;
+
+        switch (position) {
+            case 1:
+                fragment = new ItemDetailFragmentTwo();
+                break;
+
+            case 0:
+            default:
+                fragment = new ItemDetailFragmentOne();
+                break;
+        }
+
+        return fragment;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,18 +96,24 @@ public class ItemListActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        // NO OP
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter());
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
+        private static final int FRAGMENT_COUNT = 2;
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
-        }
+        private String[] menuItemText = {
+            "Menu Item One",
+            "Menu Item Two"
+        };
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -91,26 +124,27 @@ public class ItemListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+
+            holder.mIdView.setText(menuItemText[position]);
+
+            final int listPosition = position;
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        ItemDetailFragment fragment = new ItemDetailFragment();
-                        fragment.setArguments(arguments);
+
+                        Fragment fragment = createFragmentForPosition(listPosition);
+
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.item_detail_container, fragment)
                                 .commit();
+
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
+                        intent.putExtra(FRAGMENT_INDEX, listPosition);
                         context.startActivity(intent);
                     }
                 }
@@ -119,25 +153,17 @@ public class ItemListActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return FRAGMENT_COUNT;
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final TextView mIdView;
-            public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
     }
