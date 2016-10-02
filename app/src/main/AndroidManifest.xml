@@ -27,6 +27,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".controller.ItemListActivity" />
         </activity>
+        <provider android:name="com.appstoremarketresearch.android_waroftheworlds.model.AppContentProvider"
+            android:authorities="com.appstoremarketresearch.android_waroftheworlds.model.AppContentProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

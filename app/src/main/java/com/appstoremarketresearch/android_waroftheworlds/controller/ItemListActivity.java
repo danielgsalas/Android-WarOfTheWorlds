@@ -1,7 +1,10 @@
 package com.appstoremarketresearch.android_waroftheworlds.controller;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.model.AppContentProvider;
 import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentOne;
 import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentTwo;
 
@@ -44,6 +49,8 @@ public class ItemListActivity
 
     public static final String FRAGMENT_INDEX = "fragment_index";
 
+    private static final String LOG_TAG = ItemListActivity.class.getSimpleName();
+
     /**
      * createFragmentForPosition
      */
@@ -63,6 +70,65 @@ public class ItemListActivity
         }
 
         return fragment;
+    }
+
+    /**
+     * initializeDatabaseRows
+     */
+    private void initializeDatabaseRows() {
+        ContentResolver resolver = getContentResolver();
+
+        Cursor cursor = resolver.query(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD,
+            null, null, null, null);
+
+        if (cursor == null) {
+            Log.e(LOG_TAG, "Failed to query database");
+        }
+        else if (cursor.getCount() == 0) {
+
+            int rowCount = 5;
+
+            for (int i = 0; i < rowCount; i++) {
+
+                int id = (int)(Math.random() * 1000);
+
+                ContentValues values = new ContentValues();
+                values.put("id", id);
+                values.put("name", "martian-" + id);
+
+                resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN, values);
+            }
+
+            for (int i = 0; i < rowCount; i++) {
+
+                ContentValues values = new ContentValues();
+                values.put("id", i);
+                values.put("commander_id", (int)(Math.random() * 1000));
+                values.put("driver_id", (int)(Math.random() * 1000));
+                values.put("gunner_id", (int)(Math.random() * 1000));
+                values.put("heat_ray", i%2 == 0 ? true : false);
+                values.put("black_smoke", i%2 != 0 ? true : false);
+
+                resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD, values);
+            }
+        }
+        else {
+            String[] columnNames = cursor.getColumnNames();
+
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                String databaseValues = "martian_tripod";
+
+                for (int i = 0; i < columnNames.length; i++) {
+                    databaseValues += " " + cursor.getString(i);
+                }
+
+                Log.d(LOG_TAG, databaseValues);
+
+                cursor.moveToNext();
+            }
+        }
     }
 
     @Override
@@ -99,6 +165,12 @@ public class ItemListActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
         // NO OP
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializeDatabaseRows();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
