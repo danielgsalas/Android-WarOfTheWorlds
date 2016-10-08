@@ -86,15 +86,33 @@ public class ItemListActivity
         }
         else if (cursor.getCount() == 0) {
 
-            int rowCount = 5;
+            int rowCount = 6;
 
             for (int i = 0; i < rowCount; i++) {
 
                 int id = (int)(Math.random() * 1000);
 
                 ContentValues values = new ContentValues();
-                values.put("id", id);
+                //values.put("_id", id); // autoincremented
                 values.put("name", "martian-" + id);
+
+                double random = Math.random();
+
+                if (random > 0.8) {
+                    values.put("observation", "Watching from tripod");
+                }
+                else if (random > 0.6) {
+                    values.put("observation", "Crawling away from tripod");
+                }
+                else if (random > 0.4) {
+                    values.put("observation", "Crawling toward tripod");
+                }
+                else if (random > 0.2) {
+                    values.put("observation", "Restraining prisoner");
+                }
+                else {
+                    values.put("observation", "Operating heat ray");
+                }
 
                 resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN, values);
             }
@@ -102,12 +120,14 @@ public class ItemListActivity
             for (int i = 0; i < rowCount; i++) {
 
                 ContentValues values = new ContentValues();
-                values.put("id", i);
-                values.put("commander_id", (int)(Math.random() * 1000));
-                values.put("driver_id", (int)(Math.random() * 1000));
-                values.put("gunner_id", (int)(Math.random() * 1000));
-                values.put("heat_ray", i%2 == 0 ? true : false);
-                values.put("black_smoke", i%2 != 0 ? true : false);
+                //values.put("_id", i); // autoincremented
+
+                if (Math.random() > 0.66) {
+                    values.put("description", "Fighting-machine with heat ray");
+                }
+                else {
+                    values.put("description", "Anti-personnel machine with black smoke");
+                }
 
                 resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD, values);
             }
@@ -183,8 +203,8 @@ public class ItemListActivity
         private static final int FRAGMENT_COUNT = 2;
 
         private String[] menuItemText = {
-            "Menu Item One",
-            "Menu Item Two"
+            "List of Observed Martians",
+            "List of Martian Tripods"
         };
 
         @Override

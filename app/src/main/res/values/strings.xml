@@ -1,24 +1,22 @@
 <resources>
     <string name="app_name">Android-WarOfTheWorlds</string>
     <string name="title_item_detail">Item Detail</string>
-<string name="sql_create_table_martian">
+
+	<string name="sql_create_table_martian">
 	CREATE TABLE martian (
-		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-		name TEXT NOT NULL
+		_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		name TEXT,
+		observation TEXT
 	)
 	</string>
 	<string name="sql_create_table_martian_tripod">
 	CREATE TABLE martian_tripod (
-		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-		commander_id INTEGER,
-		driver_id INTEGER,
-		gunner_id INTEGER,
-		heat_ray BOOLEAN NOT NULL,
-		black_smoke BOOLEAN NOT NULL
+		_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		description TEXT
 	)
 	</string>
 
-	<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
