@@ -1,14 +1,18 @@
 package com.appstoremarketresearch.android_waroftheworlds.view;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.model.MartianTripodLoaderCallbacks;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +22,10 @@ import com.appstoremarketresearch.android_waroftheworlds.R;
  * Use the {@link ItemDetailFragmentTwo#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ItemDetailFragmentTwo extends Fragment {
+public class ItemDetailFragmentTwo extends ListFragment {
+
+    private SimpleCursorAdapter mAdapter;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,6 +39,29 @@ public class ItemDetailFragmentTwo extends Fragment {
 
     public ItemDetailFragmentTwo() {
         // Required empty public constructor
+    }
+
+    /**
+     * initializeContentLoader
+     */
+    private void initializeContentLoader() {
+
+        String[] columns = new String[] {
+            "_id", "description" };
+
+        int[] viewIds = new int[] {
+            R.id.text1, R.id.text2 };
+
+        mAdapter = new SimpleCursorAdapter(getActivity(),
+            R.layout.fragment_two_list_item, null, columns, viewIds, 0);
+
+        setListAdapter(mAdapter);
+
+        MartianTripodLoaderCallbacks callbacks = new MartianTripodLoaderCallbacks(getActivity());
+        callbacks.setCursorAdapter(mAdapter);
+
+        int loaderId = callbacks.getClass().getSimpleName().hashCode();
+        getLoaderManager().initLoader(loaderId, null, callbacks);
     }
 
     /**
@@ -59,13 +89,15 @@ public class ItemDetailFragmentTwo extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        initializeContentLoader();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_fragment_two, container, false);
+        return inflater.inflate(R.layout.item_detail_list_view, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

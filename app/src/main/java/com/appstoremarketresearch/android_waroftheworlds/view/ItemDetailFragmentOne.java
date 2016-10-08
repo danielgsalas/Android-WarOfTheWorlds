@@ -1,14 +1,18 @@
 package com.appstoremarketresearch.android_waroftheworlds.view;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
+import com.appstoremarketresearch.android_waroftheworlds.model.MartianLoaderCallbacks;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +22,10 @@ import com.appstoremarketresearch.android_waroftheworlds.R;
  * Use the {@link ItemDetailFragmentOne#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ItemDetailFragmentOne extends Fragment {
+public class ItemDetailFragmentOne extends ListFragment {
+
+    private SimpleCursorAdapter mAdapter;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,6 +39,29 @@ public class ItemDetailFragmentOne extends Fragment {
 
     public ItemDetailFragmentOne() {
         // Required empty public constructor
+    }
+
+    /**
+     * initializeContentLoader
+     */
+    private void initializeContentLoader() {
+
+        String[] columns = new String[] {
+            "_id", "name", "observation" };
+
+        int[] viewIds = new int[] {
+            R.id.text1, R.id.text2, R.id.text3 };
+
+        mAdapter = new SimpleCursorAdapter(getActivity(),
+            R.layout.fragment_one_list_item, null, columns, viewIds, 0);
+
+        setListAdapter(mAdapter);
+
+        MartianLoaderCallbacks callbacks = new MartianLoaderCallbacks(getActivity());
+        callbacks.setCursorAdapter(mAdapter);
+
+        int loaderId = callbacks.getClass().getSimpleName().hashCode();
+        getLoaderManager().initLoader(loaderId, null, callbacks);
     }
 
     /**
@@ -59,13 +89,40 @@ public class ItemDetailFragmentOne extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        initializeContentLoader();
+
+        //testCursorHandler();
+    }
+
+    // Testing using the MartianLoader.CursorHandler interface
+    private void testCursorHandler() {
+        MartianLoaderCallbacks callbacks = new MartianLoaderCallbacks(getActivity());
+
+        callbacks.setCursorHandler(new MartianLoaderCallbacks.CursorHandler() {
+            @Override
+            public void handleCursor(Cursor cursor) {
+
+                if (cursor != null) {
+                    cursor.moveToFirst();
+
+                    while (!cursor.isAfterLast()) {
+                        // TODO: read from cursor
+                        cursor.moveToNext();
+                    }
+                }
+            }
+        });
+
+        int callbacksId = callbacks.getClass().getSimpleName().hashCode();
+        getLoaderManager().initLoader(callbacksId, null, callbacks);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_fragment_one, container, false);
+        return inflater.inflate(R.layout.item_detail_list_view, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
