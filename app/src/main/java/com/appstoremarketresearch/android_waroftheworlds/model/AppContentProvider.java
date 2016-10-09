@@ -59,6 +59,20 @@ public class AppContentProvider extends ContentProvider {
         return null;
     }
 
+    public SQLiteDatabase getReadableDatabase() {
+        if (dbHelper != null) {
+            return dbHelper.getReadableDatabase();
+        }
+        return null;
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
+        if (dbHelper != null) {
+            return dbHelper.getWritableDatabase();
+        }
+        return null;
+    }
+
     @Override
     public Uri insert (
         Uri uri,
