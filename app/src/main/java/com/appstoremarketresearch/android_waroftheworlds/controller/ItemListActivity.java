@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
 import com.appstoremarketresearch.android_waroftheworlds.model.AppContentProvider;
+import com.appstoremarketresearch.android_waroftheworlds.model.AppDatabaseHelper;
 import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentOne;
 import com.appstoremarketresearch.android_waroftheworlds.view.ItemDetailFragmentTwo;
 
@@ -122,11 +123,16 @@ public class ItemListActivity
                 ContentValues values = new ContentValues();
                 //values.put("_id", i); // autoincremented
 
-                if (Math.random() > 0.66) {
+                double random = Math.random();
+
+                if (random > 0.6) {
                     values.put("description", "Fighting-machine with heat ray");
                 }
-                else {
+                else if (random > 0.3) {
                     values.put("description", "Anti-personnel machine with black smoke");
+                }
+                else {
+                    values.put("description", "Agri-machine with red weed planter");
                 }
 
                 resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD, values);
@@ -183,6 +189,12 @@ public class ItemListActivity
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        deleteDatabase(AppDatabaseHelper.DB_NAME);
+    }
+
+    @Override
     public void onFragmentInteraction(Uri uri) {
         // NO OP
     }
@@ -191,6 +203,11 @@ public class ItemListActivity
     public void onResume() {
         super.onResume();
         initializeDatabaseRows();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
