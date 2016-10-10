@@ -1,10 +1,13 @@
 package com.appstoremarketresearch.android_waroftheworlds.controller;
 
+import android.content.ContentProvider;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 
 import com.appstoremarketresearch.android_waroftheworlds.R;
 import com.appstoremarketresearch.android_waroftheworlds.model.AppContentProvider;
@@ -203,6 +205,7 @@ public class ItemListActivity
     public void onResume() {
         super.onResume();
         initializeDatabaseRows();
+        testGetReadableDatabase();
     }
 
     @Override
@@ -212,6 +215,35 @@ public class ItemListActivity
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter());
+    }
+
+    /**
+     * testGetReadableDatabase
+     */
+    private void testGetReadableDatabase() {
+        ContentResolver resolver = getContentResolver();
+
+        // uri is required, otherwise get NullPointerException from
+        // com.android.internal.util.Preconditions.checkNotNull
+        Uri uri = AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD;
+
+        // the SQLiteDatabase is not Parcelable or Serializable, so
+        // you can't retrieve it through method ContentResolver.call
+
+        ContentProviderClient client = resolver.acquireContentProviderClient(uri);
+        ContentProvider provider = client.getLocalContentProvider();
+
+        if (provider instanceof AppContentProvider) {
+            SQLiteDatabase db = ((AppContentProvider)provider).getReadableDatabase();
+
+            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM MARTIAN_TRIPOD", null);
+
+            if (cursor != null && cursor.getCount() == 1) {
+                cursor.moveToFirst();
+                String message = "Count of Martian tripods = " + cursor.getInt(0);
+                Log.d(this.getClass().getSimpleName(), message);
+            }
+        }
     }
 
     public class SimpleItemRecyclerViewAdapter
