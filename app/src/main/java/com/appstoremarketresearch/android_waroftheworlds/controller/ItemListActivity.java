@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -81,14 +82,19 @@ public class ItemListActivity
     private void initializeDatabaseRows() {
         ContentResolver resolver = getContentResolver();
 
-        Cursor cursor = resolver.query(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD,
-            null, null, null, null);
+        Cursor cursor = resolver.query(
+            AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD,
+            new String[] { "_id", "description" } ,
+            "_id > ?",
+            new String[] { "0" },
+            "_id ASC" );
 
         if (cursor == null) {
             Log.e(LOG_TAG, "Failed to query database");
         }
         else if (cursor.getCount() == 0) {
 
+            Resources res = getResources();
             int rowCount = 6;
 
             for (int i = 0; i < rowCount; i++) {
@@ -99,22 +105,27 @@ public class ItemListActivity
                 //values.put("_id", id); // autoincremented
                 values.put("name", "martian-" + id);
 
+                int martian_tripod_id = (int)(Math.random() * rowCount);
+                values.put("martian_tripod_id", martian_tripod_id);
+
                 double random = Math.random();
 
+                String columnName = "observation";
+
                 if (random > 0.8) {
-                    values.put("observation", "Watching from tripod");
+                    values.put(columnName, res.getString(R.string.martian_observation_1));
                 }
                 else if (random > 0.6) {
-                    values.put("observation", "Crawling away from tripod");
+                    values.put(columnName, res.getString(R.string.martian_observation_2));
                 }
                 else if (random > 0.4) {
-                    values.put("observation", "Crawling toward tripod");
+                    values.put(columnName, res.getString(R.string.martian_observation_3));
                 }
                 else if (random > 0.2) {
-                    values.put("observation", "Restraining prisoner");
+                    values.put(columnName, res.getString(R.string.martian_observation_4));
                 }
                 else {
-                    values.put("observation", "Operating heat ray");
+                    values.put(columnName, res.getString(R.string.martian_observation_5));
                 }
 
                 resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN, values);
@@ -127,17 +138,20 @@ public class ItemListActivity
 
                 double random = Math.random();
 
+                String columnName = "description";
+
                 if (random > 0.6) {
-                    values.put("description", "Fighting-machine with heat ray");
+                    values.put(columnName, res.getString(R.string.martian_tripod_type_1));
                 }
                 else if (random > 0.3) {
-                    values.put("description", "Anti-personnel machine with black smoke");
+                    values.put(columnName, res.getString(R.string.martian_tripod_type_2));
                 }
                 else {
-                    values.put("description", "Agri-machine with red weed planter");
+                    values.put(columnName, res.getString(R.string.martian_tripod_type_3));
                 }
 
-                resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD, values);
+                Uri rowUri = resolver.insert(AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD, values);
+                Log.d(this.getClass().getSimpleName(), "rowUri = " + rowUri);
             }
         }
         else {
@@ -188,11 +202,7 @@ public class ItemListActivity
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         deleteDatabase(AppDatabaseHelper.DB_NAME);
     }
 
@@ -205,7 +215,7 @@ public class ItemListActivity
     public void onResume() {
         super.onResume();
         initializeDatabaseRows();
-        testGetReadableDatabase();
+        testRawQueries();
     }
 
     @Override
@@ -218,9 +228,9 @@ public class ItemListActivity
     }
 
     /**
-     * testGetReadableDatabase
+     * testRawQueries
      */
-    private void testGetReadableDatabase() {
+    private void testRawQueries() {
         ContentResolver resolver = getContentResolver();
 
         // uri is required, otherwise get NullPointerException from
@@ -236,12 +246,37 @@ public class ItemListActivity
         if (provider instanceof AppContentProvider) {
             SQLiteDatabase db = ((AppContentProvider)provider).getReadableDatabase();
 
-            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM MARTIAN_TRIPOD", null);
+            String sql = "SELECT COUNT(*) FROM MARTIAN_TRIPOD";
+            Cursor cursor = db.rawQuery(sql, null);
 
-            if (cursor != null && cursor.getCount() == 1) {
+            if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 String message = "Count of Martian tripods = " + cursor.getInt(0);
                 Log.d(this.getClass().getSimpleName(), message);
+                cursor.close();
+            }
+
+            sql = "SELECT martian._id, martian.name, martian_tripod.description\n" +
+                  "    FROM martian, martian_tripod\n" +
+                  "   WHERE martian.martian_tripod_id = martian_tripod._id\n" +
+                  "     AND martian._id = ?\n" +
+                  "ORDER BY martian.name ASC";
+
+            cursor = db.rawQuery(sql, new String[] { "2" });
+
+            if (cursor != null) {
+
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+
+                    String message = "Count of record columns = " + cursor.getColumnCount();
+                    Log.d(this.getClass().getSimpleName(), message);
+
+                    cursor.moveToNext();
+                }
+
+                cursor.close();
             }
         }
     }
