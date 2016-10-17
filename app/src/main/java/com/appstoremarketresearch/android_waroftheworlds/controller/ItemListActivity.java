@@ -241,6 +241,12 @@ public class ItemListActivity
         // you can't retrieve it through method ContentResolver.call
 
         ContentProviderClient client = resolver.acquireContentProviderClient(uri);
+
+        if (client == null) {
+            // custom ContentProvider disabled for testing
+            return;
+        }
+
         ContentProvider provider = client.getLocalContentProvider();
 
         if (provider instanceof AppContentProvider) {
@@ -262,7 +268,9 @@ public class ItemListActivity
                   "     AND martian._id = ?\n" +
                   "ORDER BY martian.name ASC";
 
-            cursor = db.rawQuery(sql, new String[] { "2" });
+            String[] selectionArgs =  new String[] { "2" };
+
+            cursor = db.rawQuery(sql, selectionArgs);
 
             if (cursor != null) {
 
