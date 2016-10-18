@@ -61,6 +61,11 @@ public class MartianTripodLoaderCallbacks
             Log.e(logtag, "onLoadFinished cursor is null");
         }
         else if (cursorAdapter != null) {
+            
+            if (cursorAdapter.getCursor() != null) {
+                cursorAdapter.getCursor().close();
+            }
+            
             cursorAdapter.swapCursor(cursor);
         }
         else if (cursorHandler != null) {
@@ -72,6 +77,11 @@ public class MartianTripodLoaderCallbacks
     public void onLoaderReset(Loader<Cursor> loader) {
 
         if (cursorAdapter != null) {
+            
+            if (cursorAdapter.getCursor() != null) {
+                cursorAdapter.getCursor().close();
+            }
+            
             cursorAdapter.swapCursor(null);
         }
         else if (cursorHandler != null) {
