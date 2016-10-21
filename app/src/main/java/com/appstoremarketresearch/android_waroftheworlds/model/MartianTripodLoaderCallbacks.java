@@ -48,7 +48,13 @@ public class MartianTripodLoaderCallbacks
         Bundle args) {
 
         Uri uri = AppContentProvider.CONTENT_URI_MARTIAN_TRIPOD;
-        return new CursorLoader(this.context, uri, null, null, null, null);
+        String[] projection = { "_id", "description" };
+        String selection = null;
+        String[] selectionArgs = null;
+        String sortOrder = "_id ASC";
+
+        return new CursorLoader(this.context, uri,
+            projection, selection, selectionArgs, sortOrder);
     }
 
     @Override
@@ -62,11 +68,11 @@ public class MartianTripodLoaderCallbacks
         }
         else if (cursorAdapter != null) {
             
-            if (cursorAdapter.getCursor() != null) {
-                cursorAdapter.getCursor().close();
+            Cursor oldCursor = cursorAdapter.swapCursor(cursor);
+
+            if (oldCursor != null) {
+                oldCursor.close();
             }
-            
-            cursorAdapter.swapCursor(cursor);
         }
         else if (cursorHandler != null) {
             cursorHandler.handleCursor(cursor);
@@ -78,11 +84,11 @@ public class MartianTripodLoaderCallbacks
 
         if (cursorAdapter != null) {
             
-            if (cursorAdapter.getCursor() != null) {
-                cursorAdapter.getCursor().close();
+            Cursor oldCursor = cursorAdapter.swapCursor(null);
+
+            if (oldCursor != null) {
+                oldCursor.close();
             }
-            
-            cursorAdapter.swapCursor(null);
         }
         else if (cursorHandler != null) {
             cursorHandler.handleCursor(null);
